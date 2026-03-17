@@ -15,28 +15,13 @@
             margin: 0; 
             padding-top: 20px; 
         }
-
-        .back-link {
-            text-decoration: none;
-            margin-bottom: 15px; 
-        }
-
+        .back-link { text-decoration: none; margin-bottom: 15px; }
         .back-btn {
-            background: #ffffff; 
-            color: #007bff; 
-            border: 2px solid #007bff;
-            padding: 8px 20px; 
-            border-radius: 20px; 
-            cursor: pointer; 
-            font-weight: bold; 
-            transition: 0.3s;
+            background: #ffffff; color: #007bff; border: 2px solid #007bff;
+            padding: 8px 20px; border-radius: 20px; cursor: pointer;
+            font-weight: bold; transition: 0.3s;
         }
-
-        .back-btn:hover {
-            background: #007bff;
-            color: white;
-        }
-
+        .back-btn:hover { background: #007bff; color: white; }
         .chat-container { width: 450px; max-width: 95%; background: white; border-radius: 15px; box-shadow: 0 5px 25px rgba(0,0,0,0.1); display: flex; flex-direction: column; overflow: hidden; height: 650px; }
         .chat-header { background: #007bff; color: white; padding: 20px; text-align: center; font-weight: bold; font-size: 1.2rem; }
         #chat-box { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; background: #f9f9f9; }
@@ -59,7 +44,7 @@
 <div class="chat-container">
     <div class="chat-header">🎓 مساعد حل الأسئلة</div>
     <div id="chat-box">
-        <div class="message ai-msg">مرحباً بك يا صديقي العزيز، أنا هنا الذكاء الاصطناعي الخاص بـ TAIPING STUDY HARD اسألني عن أي شيء وسأجيبك في الحال</div>
+        <div class="message ai-msg">مرحباً بك يا صديقي، أنا ذكاء TAIPING STUDY HARD الاصطناعي.. كيف يمكنني مساعدتك اليوم؟</div>
     </div>
     <div class="chat-input">
         <input type="text" id="user-input" placeholder="اكتب سؤالك هنا..." onkeypress="if(event.key === 'Enter') sendMessage()">
@@ -76,13 +61,12 @@
         
         if (!userText) return;
 
-        // 1. إظهار رسالتك في الشات
         appendMessage(userText, 'user-msg');
         inputField.value = "";
         sendBtn.disabled = true;
 
         try {
-            // 2. إرسال السؤال للسيرفر (تم تعديل المسار ليتوافق مع Vercel)
+            // الطلب يذهب لمسار /api/chat الموحد
             const response = await fetch('/api/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -90,12 +74,10 @@
             });
             
             const data = await response.json();
-
-            // 3. إظهار رد الذكاء الاصطناعي
             appendMessage(data.text, 'ai-msg');
         } catch (error) {
             console.error("خطأ:", error);
-            appendMessage("❌ حدث خطأ في الاتصال بالسيرفر، يرجى المحاولة لاحقاً.", 'ai-msg');
+            appendMessage("❌ فشل الاتصال بالسيرفر، يرجى المحاولة لاحقاً.", 'ai-msg');
         } finally {
             sendBtn.disabled = false;
         }
