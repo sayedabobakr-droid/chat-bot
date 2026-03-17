@@ -1,0 +1,42 @@
+require('dotenv').config();
+const express = require('express');
+const path = require('path');
+const { OpenAI } = require('openai');
+
+const app = express();
+app.use(express.json());
+app.use(express.static(__dirname));
+
+// إعداد الاتصال بموديل Qwen عبر منصة Hugging Face
+const client = new OpenAI({
+    baseURL: "https://router.huggingface.co/v1",
+    apiKey: process.env.HF_TOKEN, 
+});
+
+app.post('/chat', async (req, res) => {
+    try {
+        const chatCompletion = await client.chat.completions.create({
+            model: "Qwen/Qwen2.5-7B-Instruct:together",
+            messages: [
+                { role: "system", content: "أنت مساعد تعليمي خبير ومفيد للطلاب." },
+                { role: "user", content: req.body.prompt },
+            ],
+            max_tokens: 500,
+        });
+
+        res.json({ text: chatCompletion.choices[0].message.content });
+    } catch (error) {
+        console.error("خطأ:", error.message);
+        res.json({ text: "حدث خطأ في الاتصال، حاول مرة أخرى." });
+    }
+});
+
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+// --- التعديل المهم للتشغيل الأبدي ---
+const PORT = process.env.PORT || 3000; 
+app.listen(PORT, () => {
+    console.log(`✅ السيرفر يعمل الآن على المنفذ: ${PORT}`);
+});

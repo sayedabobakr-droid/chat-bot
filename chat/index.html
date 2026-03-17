@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مساعد TAIPING STUDY HARD</title>
+    <style>
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background-color: #f4f7f6; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            min-height: 100vh; 
+            margin: 0; 
+            padding-top: 20px; 
+        }
+
+        .back-link {
+            text-decoration: none;
+            margin-bottom: 15px; 
+        }
+
+        .back-btn {
+            background: #ffffff; 
+            color: #007bff; 
+            border: 2px solid #007bff;
+            padding: 8px 20px; 
+            border-radius: 20px; 
+            cursor: pointer; 
+            font-weight: bold; 
+            transition: 0.3s;
+        }
+
+        .back-btn:hover {
+            background: #007bff;
+            color: white;
+        }
+
+        .chat-container { width: 450px; max-width: 95%; background: white; border-radius: 15px; box-shadow: 0 5px 25px rgba(0,0,0,0.1); display: flex; flex-direction: column; overflow: hidden; height: 650px; }
+        .chat-header { background: #007bff; color: white; padding: 20px; text-align: center; font-weight: bold; font-size: 1.2rem; }
+        #chat-box { flex: 1; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; background: #f9f9f9; }
+        .message { padding: 12px 18px; border-radius: 18px; max-width: 80%; line-height: 1.5; font-size: 15px; word-wrap: break-word; }
+        .user-msg { background: #007bff; color: white; align-self: flex-start; border-bottom-right-radius: 2px; }
+        .ai-msg { background: #e9ecef; color: #333; align-self: flex-end; border-bottom-left-radius: 2px; border: 1px solid #dee2e6; }
+        .chat-input { display: flex; padding: 15px; border-top: 1px solid #eee; background: white; }
+        input { flex: 1; padding: 12px; border: 1px solid #ddd; border-radius: 25px; outline: none; padding-right: 20px; }
+        #send-btn { background: #007bff; color: white; border: none; padding: 10px 20px; margin-right: 8px; border-radius: 25px; cursor: pointer; font-weight: bold; transition: 0.3s; }
+        #send-btn:hover { background: #0056b3; }
+        #send-btn:disabled { background: #ccc; }
+    </style>
+</head>
+<body>
+
+<a href="../index.html" class="back-link">
+    <button class="back-btn">🏠 العودة للصفحة الرئيسية</button>
+</a>
+
+<div class="chat-container">
+    <div class="chat-header">🎓 مساعد حل الأسئلة</div>
+    <div id="chat-box">
+        <div class="message ai-msg">مرحباً بك يا صديقي العزيز، أنا هنا الذكاء الاصطناعي الخاص بـ TAIPING STUDY HARD اسألني عن أي شيء وسأجيبك في الحال</div>
+    </div>
+    <div class="chat-input">
+        <input type="text" id="user-input" placeholder="اكتب سؤالك هنا..." onkeypress="if(event.key === 'Enter') sendMessage()">
+        <button id="send-btn" onclick="sendMessage()">إرسال</button>
+    </div>
+</div>
+
+<script>
+    async function sendMessage() {
+        const inputField = document.getElementById("user-input");
+        const sendBtn = document.getElementById("send-btn");
+        const chatBox = document.getElementById("chat-box");
+        const userText = inputField.value.trim();
+        
+        if (!userText) return;
+
+        // 1. إظهار رسالتك في الشات
+        appendMessage(userText, 'user-msg');
+        inputField.value = "";
+        sendBtn.disabled = true;
+
+        try {
+            // 2. إرسال السؤال للسيرفر (تم تعديل المسار ليتوافق مع Vercel)
+            const response = await fetch('/api/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ prompt: userText })
+            });
+            
+            const data = await response.json();
+
+            // 3. إظهار رد الذكاء الاصطناعي
+            appendMessage(data.text, 'ai-msg');
+        } catch (error) {
+            console.error("خطأ:", error);
+            appendMessage("❌ حدث خطأ في الاتصال بالسيرفر، يرجى المحاولة لاحقاً.", 'ai-msg');
+        } finally {
+            sendBtn.disabled = false;
+        }
+    }
+
+    function appendMessage(text, className) {
+        const msgDiv = document.createElement("div");
+        msgDiv.className = `message ${className}`;
+        msgDiv.innerText = text;
+        const chatBox = document.getElementById("chat-box");
+        chatBox.appendChild(msgDiv);
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }
+</script>
+</body>
+</html>
